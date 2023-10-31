@@ -3,6 +3,7 @@ import subprocess
 import threading
 import queue
 import signal
+from serial.tools import list_ports
 from werkzeug.serving import run_simple, WSGIRequestHandler
 
 app = Flask(__name__)
@@ -14,6 +15,12 @@ log_queue = queue.Queue()
 process = None
 # Global variable to indicate if the thread should stop
 stop_thread = False
+
+# Global dictionary to hold service statuses
+service_statuses = {
+    "pio_remote": "Stopped",
+    "webcam_stream": "Stopped",
+}
 
 
 @app.route("/")
@@ -44,25 +51,40 @@ def get_pio_remote_log():
 
 @app.route("/service_status")
 def service_status():
-    # For demonstration purposes, I'm returning dummy data. You'd replace this with actual status checks.
-    statuses = {"pio_remote": "Running", "service2": "Stopped", "service3": "Error"}
-    return jsonify(statuses)
+    # Return the real statuses from the global service_statuses dictionary
+    return jsonify(service_statuses)
+
+
+@app.route("/serial_devices")
+def get_serial_devices():
+    devices = [
+        {"device": port.device, "description": port.description}
+        for port in list_ports.comports()
+    ]
+    return jsonify(devices)
 
 
 # Function to run PIO Remote Agent
 def run_pio_remote_agent():
-    global process, stop_thread
+    global process, stop_thread, service_statuses
     process = subprocess.Popen(
         ["pio", "remote", "agent", "start"],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         universal_newlines=True,
     )
+    service_statuses["pio_remote"] = "Running"
     while not stop_thread:
         output = process.stdout.readline()
         if output:
             log_queue.put(output.strip())  # Add log to queue
         else:  # No more output, break the loop
+            if process.poll() is not None:
+                # Check if the process ended due to an error
+                if process.returncode != 0:
+                    service_statuses["pio_remote"] = "Error"
+                else:
+                    service_statuses["pio_remote"] = "Stopped"
             break
 
     process.terminate()
@@ -73,7 +95,8 @@ def signal_handler(sig, frame):
     global stop_thread
     print("Shutting down gracefully...")
     stop_thread = True
-    process.terminate()
+    if process:
+        process.terminate()
     exit(0)
 
 
