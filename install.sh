@@ -7,9 +7,10 @@ sudo apt-get update
 sudo apt-get install -y avahi-daemon
 
 # Download and install Miniconda
-wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-aarch64.sh -O miniconda.sh
-bash miniconda.sh -b -p $HOME/miniconda
-rm miniconda.sh
+mkdir -p ~/miniconda3
+wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-aarch64.sh -O ~/miniconda3/miniconda.sh
+bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
+rm -rf ~/miniconda3/miniconda.sh
 
 # Optionally, add Miniconda to PATH, or do this manually later
 echo 'export PATH="$HOME/miniconda/bin:$PATH"' >> ~/.bashrc
