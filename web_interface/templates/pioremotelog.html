@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+    #log-container {
+        background-color: #282c34;
+        /* Dark background */
+        color: #61afef;
+        /* Light blue text color */
+        font-family: 'Courier New', Courier, monospace;
+        /* Monospace font */
+        padding: 20px;
+        border-radius: 5px;
+        overflow-y: auto;
+        /* Enable scrolling if content overflows */
+        max-height: 600px;
+        /* Adjust based on your needs */
+        border: 1px solid #4a5160;
+        /* Slight border for definition */
+        white-space: pre-wrap;
+        /* Preserves spacing and newlines */
+    }
+
+    .log-entry {
+        margin-bottom: 8px;
+        color: #abb2bf;
+        /* Slightly lighter text for the logs */
+    }
+</style>
+
+<div id="log-container">
+    <!-- Logs will be inserted here -->
+</div>
+
+<script>
+    function updateLogs() {
+        fetch('/get_pioremotelog')
+            .then(response => response.json())
+            .then(data => {
+                const logContainer = document.getElementById('log-container');
+                data.forEach(log => {
+                    const logElement = document.createElement('div');
+                    logElement.classList.add('log-entry');  // Add the log-entry class
+                    logElement.textContent = log;
+                    logContainer.appendChild(logElement);
+                });
+            });
+    }
+    setInterval(updateLogs, 1000);  // Update logs every 1 second
+</script>
+
+{% endblock %}

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Test Stand Dashboard</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar -->
+        <div class="bg-light border-right" id="sidebar-wrapper">
+            <div class="sidebar-heading">Test Stand Dashboard</div>
+            <div class="list-group list-group-flush">
+                <a href="/" class="list-group-item list-group-item-action bg-light">Dashboard</a>
+                <a href="/pioremotelog" class="list-group-item list-group-item-action bg-light">PIO Remote Log</a>
+                <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            </div>
+        </div>
+        <!-- /#sidebar-wrapper -->
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <div class="container-fluid">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+        <!-- /#page-content-wrapper -->
+    </div>
+    <!-- /#wrapper -->
+</body>
+
+</html>

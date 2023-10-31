@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="mt-4">Welcome to the Test Stand Dashboard</h1>
+
+<h2 class="mt-4">Service Status</h2>
+<div class="row" id="service-status-container">
+    <!-- Include spinner until loaded -->
+    <div class="row" id="service-status-container">
+        <div class="d-flex justify-content-center mt-4" id="loading-spinner">
+            <div class="spinner-border text-primary" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+        <!-- Service statuses will be inserted here -->
+    </div>
+
+</div>
+
+<script>
+    function getStatusClass(status) {
+        switch (status) {
+            case "Running": return ["bg-success", "text-white"];
+            case "Stopped": return ["bg-secondary", "text-white"];
+            case "Error": return ["bg-danger", "text-white"];
+            default: return ["bg-light"];
+        }
+    }
+
+
+    function updateServiceStatus() {
+        fetch('/service_status')
+            .then(response => response.json())
+            .then(data => {
+                const statusContainer = document.getElementById('service-status-container');
+                statusContainer.innerHTML = "";  // Clear existing statuses
+
+                for (const service in data) {
+                    const serviceElement = document.createElement('div');
+                    serviceElement.classList.add('col-md-4', 'mb-4'); // Bootstrap grid and margin
+
+                    const cardElement = document.createElement('div');
+                    const statusClasses = getStatusClass(data[service]);
+                    cardElement.classList.add('card', ...statusClasses); // Bootstrap card and status color
+
+                    const cardBodyElement = document.createElement('div');
+                    cardBodyElement.classList.add('card-body');
+
+                    const serviceTitle = document.createElement('h5');
+                    serviceTitle.textContent = service;
+                    serviceTitle.classList.add('card-title');
+
+                    const serviceStatus = document.createElement('p');
+                    serviceStatus.textContent = data[service];
+                    serviceStatus.classList.add('card-text');
+
+                    cardBodyElement.appendChild(serviceTitle);
+                    cardBodyElement.appendChild(serviceStatus);
+                    cardElement.appendChild(cardBodyElement);
+                    serviceElement.appendChild(cardElement);
+                    statusContainer.appendChild(serviceElement);
+                }
+
+                // Hide the loading spinner
+                document.getElementById('loading-spinner').style.display = 'none';
+            });
+    }
+
+    setInterval(updateServiceStatus, 5000);  // Update service statuses every 5 seconds
+</script>
+
+{% endblock %}
