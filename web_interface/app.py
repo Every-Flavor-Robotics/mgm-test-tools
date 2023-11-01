@@ -100,13 +100,21 @@ def signal_handler(sig, frame):
     exit(0)
 
 
-if __name__ == "__main__":
-    # Handle SIGINT
-    signal.signal(signal.SIGINT, signal_handler)
+# Handle SIGINT
+signal.signal(signal.SIGINT, signal_handler)
 
-    # Start PIO Remote Agent in a separate thread
-    t = threading.Thread(target=run_pio_remote_agent)
-    t.start()
+# Start PIO Remote Agent in a separate thread
+t = threading.Thread(target=run_pio_remote_agent)
+t.start()
+
+
+if __name__ == "__main__":
+    # # Handle SIGINT
+    # signal.signal(signal.SIGINT, signal_handler)
+
+    # # Start PIO Remote Agent in a separate thread
+    # t = threading.Thread(target=run_pio_remote_agent)
+    # t.start()
 
     # Run Flask without reloader
     run_simple("0.0.0.0", 5000, app, use_reloader=False)
